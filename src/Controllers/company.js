@@ -9,7 +9,8 @@ const security = require('../Helpers/security');
 module.exports = {
     getAllCompany: (_, res) => {
         model.getAllCompany().then(response => {
-            form.success(res, response);
+            const msg = 'success'
+            form.success(res, response, msg);
         }).catch(err => {
             console.log(err);
         });
@@ -64,9 +65,12 @@ module.exports = {
         const {
             params
         } = req;
-        console.log(params);
         model.deleteCompany(params).then(response => {
-            res.send("Deleted")
+            const data = {
+                description: "Deleted"
+            };
+            const msg = 'success';
+            form.success(res, data, msg)
         }).catch(err => console.log(err));
     }
 }

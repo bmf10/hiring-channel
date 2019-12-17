@@ -13,7 +13,7 @@ module.exports = {
             })
         })
     },
-    postCompany: body => {
+    postCompany: (body) => {
         var password = security.encrypt(body.password);
         var values = [
             [body.company_name, body.logo, body.location, body.description, body.username, password],
