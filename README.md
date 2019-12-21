@@ -3,6 +3,6 @@
 
 # Tools
 * **Project Created With**
-    *Node JS : https://nodejs.org/en/docs/
-    *ExpressJS : https://expressjs.com/
-    *MySQL : https://dev.mysql.com/doc/
+    * Node JS : https://nodejs.org/en/docs/
+    * ExpressJS : https://expressjs.com/
+    * MySQL : https://dev.mysql.com/doc/
