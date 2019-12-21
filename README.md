@@ -1,5 +1,5 @@
 # Hiring-Channel
-"Hiring-Channel" adalah sebuah restful API yang di bangun dengan platform NodeJS dan framework ExpressJS.
+"Hiring-Channel " is a RESTful API built into the NodeJS platform and the ExpressJS framework.
 
 ## Technologies
 * **Project Created With**
