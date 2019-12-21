@@ -1,11 +1,15 @@
 const model = require('../Models/engineer');
 const form = require('../Helpers/form');
-const security = require('../Helpers/security');
+const validation = require('../Models/validation');
 
 module.exports = {
-    getAllEngineer: (_, res) => {
-        model.getAllEngineer().then(response => {
-            form.success(res, response);
+    getAllEngineer: (req, res) => {
+        const {
+            query
+        } = req;
+        model.getAllEngineer(query).then(response => {
+            const msg = 'success';
+            form.success(res, response, msg);
         }).catch(err => {
             console.log(err);
         })
@@ -14,21 +18,60 @@ module.exports = {
         const {
             body
         } = req;
-        model.postEngineer(body).then(response => {
-            var password = security.encrypt(body.password);
-            const data = {
-                id: response.insertId,
-                name: body.name,
-                description: body.description,
-                location: body.location,
-                date_of_birth: body.date_of_birth,
-                date_created: body.date_created,
-                username: body.username,
-                password: password,
-            };
-            const msg = 'success'
-            form.success(res, data, msg);
-        }).catch(err => console.log(err));
+        username = body.username;
+        password = body.password;
+
+        pattern = new RegExp(/^[a-zA-Z0-9]+$/); //alphanum
+        alphanum = pattern.test(username);
+        if ((alphanum == false || username.length <= 5 || username.length >= 16) && (password.length <= 5 || password.length >= 32)) {
+            msg = 'error';
+            errors = 'Invalid Username & Password';
+            status = 200;
+            form.error(res, errors, msg, status);
+        } else if (alphanum == false || username.length <= 5 || username.length >= 16) {
+            msg = 'error';
+            errors = 'Invalid Username';
+            status = 200;
+            form.error(res, errors, msg, status);
+        } else if (password.length <= 5 || password.length >= 32) {
+            msg = 'error';
+            errors = 'Invalid Password';
+            status = 200;
+            form.error(res, errors, msg, status);
+        } else {
+            validation.companyCheck(username).then(response => {
+                if (response.length != 0) {
+                    msg = 'error';
+                    errors = 'Invalid Username';
+                    status = 200;
+                    form.error(res, errors, msg, status);
+                } else {
+                    validation.engineerCheck(username).then(response => {
+                        if (response.length != 0) {
+                            msg = 'error';
+                            errors = 'Invalid Username';
+                            status = 200;
+                            form.error(res, errors, msg, status);
+                        } else {
+                            model.postEngineer(body).then(response => {
+                                const data = {
+                                    id: response.insertId,
+                                    name: body.name,
+                                    description: body.description,
+                                    location: body.location,
+                                    date_of_birth: body.date_of_birth,
+                                    date_created: body.date_created,
+                                    username: body.username,
+                                };
+                                const msg = 'success'
+                                form.success(res, data, msg);
+                            }).catch(err => console.log(err));
+                        }
+                    }).catch(err => console.log(err));
+                }
+            }).catch(err => console.log(err))
+        }
+
     },
     postSkill: (req, res) => {
         const {
@@ -68,11 +111,60 @@ module.exports = {
             params,
             query
         } = req;
-        model.patchEngineer(query, params).then(response => {
-            const data = query;
-            const msg = 'success';
-            form.success(res, data, msg);
-        }).catch(err => console.log(err))
+
+        if (query.username != null) {
+            username = query.username;
+        } else {
+            username = "ignorethis"
+        }
+        if (query.password != null) {
+            password = query.password;
+        } else {
+            password = "ignorethis"
+        }
+
+        pattern = new RegExp(/^[a-z0-9]+$/); //alphanum
+        alphanum = pattern.test(username);
+        if ((alphanum == false || username.length <= 5 || username.length >= 16) && (password.length <= 5 || password.length >= 32)) {
+            msg = 'error';
+            errors = 'Invalid Username & Password';
+            status = 200;
+            form.error(res, errors, msg, status);
+        } else if (alphanum == false || username.length <= 5 || username.length >= 16) {
+            msg = 'error';
+            errors = 'Invalid Username';
+            status = 200;
+            form.error(res, errors, msg, status);
+        } else if (password.length <= 5 || password.length >= 32) {
+            msg = 'error';
+            errors = 'Invalid Password';
+            status = 200;
+            form.error(res, errors, msg, status);
+        } else {
+            validation.companyCheck(username).then(response => {
+                if (response.length != 0) {
+                    msg = 'error';
+                    errors = 'Invalid Username';
+                    status = 200;
+                    form.error(res, errors, msg, status);
+                } else {
+                    validation.engineerCheck(username).then(response => {
+                        if (response.length != 0) {
+                            msg = 'error';
+                            errors = 'Invalid Username';
+                            status = 200;
+                            form.error(res, errors, msg, status);
+                        } else {
+                            model.patchEngineer(query, params).then(response => {
+                                const data = query;
+                                const msg = 'success';
+                                form.success(res, data, msg);
+                            }).catch(err => console.log(err))
+                        }
+                    }).catch(err => console.log(err));
+                }
+            }).catch(err => console.log(err))
+        }
     },
     deleteEngineer: (req, res) => {
         const {
@@ -132,4 +224,13 @@ module.exports = {
             form.success(res, data, msg)
         }).catch(err => console.log(err));
     },
+    getResultSearch: (req, res) => {
+        const {
+            query
+        } = req;
+        model.getResultSearch(query).then(response => {
+            const msg = 'success';
+            form.success(res, response, msg);
+        }).catch(err => console.log(err));
+    }
 }

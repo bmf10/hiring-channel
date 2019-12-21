@@ -1,5 +1,7 @@
 const db = require('../Configs/db');
-const security = require('../Helpers/security');
+const bcrypt = require('bcryptjs');
+
+const salt = bcrypt.genSaltSync(10);
 
 module.exports = {
     getAllCompany: () => {
@@ -14,7 +16,7 @@ module.exports = {
         })
     },
     postCompany: (body) => {
-        var password = security.encrypt(body.password);
+        var password = bcrypt.hashSync(body.password, salt);
         var values = [
             [body.company_name, body.logo, body.location, body.description, body.username, password],
         ]
@@ -30,7 +32,7 @@ module.exports = {
     },
     patchCompany: (query, params) => {
         if (query.password != null) {
-            query.password = security.encrypt(query.password);
+            query.password = bcrypt.hashSync(query.password, salt);
         }
         return new Promise((resolve, reject) => {
             db.query('UPDATE company SET ? WHERE ?', [query, params], (err, response) => {

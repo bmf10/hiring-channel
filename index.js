@@ -5,6 +5,7 @@ const logger = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
+const validation = require('./src/Helpers/validation');
 
 const router = require('./src/Routes/index');
 
@@ -12,6 +13,7 @@ const index = express();
 
 index.listen(8000, () => {
     console.log('Server is Running');
+    validation.usernameCheck("a");
 })
 
 index.use(logger('dev'));

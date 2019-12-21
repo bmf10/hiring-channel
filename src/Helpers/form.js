@@ -1,15 +1,18 @@
 module.exports = {
     success: (res, data, msg) => {
+        res.status(200)
         res.json({
             status: 200,
             msg,
             data
         })
     },
-    error: (errors) => {
+    error: (res, errors, msg, status) => {
+        res.status(status)
         res.json({
-            status: 422,
-            errors
+            status: status,
+            msg,
+            errors,
         })
     }
 }
