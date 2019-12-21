@@ -26,4 +26,4 @@ No | Dependency | Version
 7 | helmet | 3.21.2
 8 | jsonwebtoken | 8.5.1
 9 | jwt-decode | 2.2.0
-9 | mysql | 2.17.1
+10 | mysql | 2.17.1
