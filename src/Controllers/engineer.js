@@ -7,9 +7,29 @@ module.exports = {
         const {
             query
         } = req;
+
         model.getAllEngineer(query).then(response => {
-            const msg = 'success';
-            form.success(res, response, msg);
+            model.CountEngineer().then(result => {
+                page = parseInt(response[2]);
+                limit = response[1];
+                dataAmount = result;
+
+                totalPage = Math.ceil(dataAmount / limit);
+                nextPage = totalPage - page;
+                prevPage = (totalPage - 1) - nextPage;
+
+                paginate = {
+                    "totalPage": totalPage,
+                    "page": page,
+                    "next": nextPage,
+                    "prev": prevPage,
+                }
+
+                data = response[0];
+
+                const msg = 'success';
+                form.success(res, data, msg, paginate);
+            })
         }).catch(err => {
             console.log(err);
         })

@@ -24,14 +24,27 @@ module.exports = {
             name = query.name;
         }
 
+        var test = "hello"
+
         return new Promise((resolve, reject) => {
             db.query("SELECT `engineer`.* , GROUP_CONCAT(DISTINCT CONCAT(skill.skill_name, ',', skill.level) SEPARATOR ';') AS skill_list , GROUP_CONCAT(DISTINCT CONCAT(showcase.showcase_name, ',', showcase.year) SEPARATOR ';') AS showcase_list FROM `engineer` LEFT JOIN `skill` ON (`engineer`.`id` = `skill`.`id_engineer`) LEFT JOIN `showcase` ON (`engineer`.`id` = `showcase`.`id_engineer`) WHERE NAME LIKE '%" + name + "%' GROUP BY engineer.id ORDER BY " + sort + " " + order + " LIMIT " + limit + " OFFSET " + offset + "", (err, response) => {
                 if (!err) {
-                    resolve(response);
+                    resolve([response, limit, page]);
                 } else {
                     reject(err);
                 }
             })
+        })
+    },
+    CountEngineer: () => {
+        return new Promise((resolve, reject) => {
+            db.query("SELECT count(*) as count FROM engineer", (err, response) => {
+                if (!err) {
+                    resolve(response[0].count);
+                } else {
+                    reject(err)
+                }
+            });
         })
     },
     postEngineer: body => {
