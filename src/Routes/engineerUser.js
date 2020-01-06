@@ -7,6 +7,8 @@ const Router = express.Router();
 
 Router.get('/', Auth, controller.getData);
 Router.patch('/', Auth, controller.patchData);
+
+Router.get('/skill', Auth, controller.getSkill);
 Router.post('/skill', Auth, controller.postSkill);
 Router.patch('/skill/:skillId', Auth, controller.patchSkill);
 Router.delete('/skill/:skillId', Auth, controller.deleteSkill);
@@ -14,6 +16,10 @@ Router.delete('/skill/:skillId', Auth, controller.deleteSkill);
 Router.post('/showcase', Auth, controller.postShowcase);
 Router.patch('/showcase/:showcaseId', Auth, controller.patchShowcase);
 Router.delete('/showcase/:showcaseId', Auth, controller.deleteShowcase);
+
+Router.get('/project', Auth, controller.getProject);
+Router.get('/request', Auth, controller.getRequest);
+Router.patch('/request', Auth, controller.executeProject);
 
 function Auth(req, res, next) {
     const authHeader = req.headers['authorization'];

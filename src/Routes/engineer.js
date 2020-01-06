@@ -5,8 +5,9 @@ const form = require('../Helpers/form');
 
 const Router = express.Router();
 
-Router.get('/', controller.getAllEngineer);
+Router.get('/', Auth1, controller.getAllEngineer);
 Router.get('/search', controller.getResultSearch);
+Router.get('/:id', Auth1, controller.getById);
 
 Router.post('/', Auth, controller.postEngineer);
 Router.post('/:id/skill', Auth, controller.postSkill);
@@ -31,6 +32,26 @@ function Auth(req, res, next) {
         form.error(res, errors, msg, status);
     } else {
         verif = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_ADMIN, (err, user) => {
+            if (err) {
+                res.send(err);
+            } else {
+                next();
+            }
+        });
+    }
+}
+
+function Auth1(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (token == null) {
+        msg = 'error';
+        errors = 'Unauthorized';
+        status = 401;
+        form.error(res, errors, msg, status);
+    } else {
+        verif = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_COMPANY, (err, user) => {
             if (err) {
                 res.send(err);
             } else {

@@ -26,12 +26,7 @@ module.exports = {
                     const msg = 'success';
                     const payload = {
                         "id": response[0].id,
-                        "company_name": response[0].company_name,
-                        "logo": response[0].logo,
-                        "location": response[0].location,
-                        "description": response[0].description,
-                        "username": response[0].username,
-                        "password": response[0].password,
+                        "name": response[0].company_name,
                         "login_as": "company"
                     }
                     const token = jwt.sign(payload, accessTokenCompany, {
@@ -56,13 +51,6 @@ module.exports = {
                             const payload = {
                                 "id": response[0].id,
                                 "name": response[0].name,
-                                "date_of_birth": response[0].date_of_birth,
-                                "date_created": response[0].date_created,
-                                "date_updated": response[0].date_updated,
-                                "location": response[0].location,
-                                "description": response[0].description,
-                                "username": response[0].username,
-                                "password": response[0].password,
                                 "login_as": "engineer"
                             }
                             const token = jwt.sign(payload, accessTokenEngineer, {

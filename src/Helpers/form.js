@@ -21,9 +21,9 @@ module.exports = {
 
     },
     error: (res, errors, msg, status) => {
-        res.status(status)
+        res.status(200)
         res.json({
-            status: status,
+            status: 200,
             msg,
             errors,
         })

@@ -5,16 +5,20 @@ const salt = bcrypt.genSaltSync(10);
 
 module.exports = {
     getAllEngineer: query => {
-        var limit = query.limit || 100;
+        var limit = query.limit || 20;
 
         if (limit == 0) {
-            limit = 100;
             var page = 1
             var offset = (page - 1) * limit;
         } else {
-            var page = query.page || 1;
+            if(isNaN(query.page)){
+                page = 1;
+            }else{
+                var page = query.page || 1;
+            }
             var offset = (page - 1) * limit;
         }
+
         var sort = query.sort || 'name';
         var order = query.order || 'asc';
 
@@ -24,14 +28,42 @@ module.exports = {
             name = query.name;
         }
 
-        var test = "hello"
+        if ((query.skill == null) && (query.name == null)) {
+            sql = "SELECT engineer.*, GROUP_CONCAT(DISTINCT skill.skill_name SEPARATOR ', ') AS skill_list, GROUP_CONCAT(DISTINCT showcase.showcase_name SEPARATOR ',') AS showcase_list,(SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` = 1)/(SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` IS NOT NULL) * 100 AS success_rate, (SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` IS NOT NULL) AS total_project, (SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` = 1) AS accept_project FROM engineer LEFT JOIN skill ON(engineer.id = skill.id_engineer) LEFT JOIN showcase ON (`engineer`.`id` = `showcase`.`id_engineer`) LEFT JOIN request ON( `engineer`.`id` = `request`.`id_engineer`) WHERE engineer.name LIKE '%%'"
+            sql += "GROUP BY engineer.id ORDER BY " + sort + " " + order + " LIMIT " + limit + " OFFSET " + offset + ""
+            sql2 = "SELECT engineer.*, GROUP_CONCAT(DISTINCT skill.skill_name SEPARATOR ', ') AS skill_list, GROUP_CONCAT(DISTINCT showcase.showcase_name SEPARATOR ',') AS showcase_list FROM engineer LEFT JOIN skill ON(engineer.id = skill.id_engineer) LEFT JOIN showcase ON (`engineer`.`id` = `showcase`.`id_engineer`) WHERE engineer.name LIKE '%%' GROUP BY engineer.id"
+            console.log("dual null");
+        } else if (query.name == null) {
+            sql = "SELECT engineer.*, GROUP_CONCAT(DISTINCT skill.skill_name SEPARATOR ', ') AS skill_list, GROUP_CONCAT(DISTINCT showcase.showcase_name SEPARATOR ',') AS showcase_list,(SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` = 1)/(SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` IS NOT NULL) * 100 AS success_rate, (SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` IS NOT NULL) AS total_project, (SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` = 1) AS accept_project FROM engineer LEFT JOIN skill ON(engineer.id = skill.id_engineer) LEFT JOIN showcase ON (`engineer`.`id` = `showcase`.`id_engineer`) LEFT JOIN request ON( `engineer`.`id` = `request`.`id_engineer`) WHERE skill.skill_name LIKE '%" + query.skill + "%'"
+            sql += "GROUP BY engineer.id ORDER BY " + sort + " " + order + " LIMIT " + limit + " OFFSET " + offset + ""
+            sql2 = "SELECT engineer.*, GROUP_CONCAT(DISTINCT skill.skill_name SEPARATOR ', ') AS skill_list, GROUP_CONCAT(DISTINCT showcase.showcase_name SEPARATOR ',') AS showcase_list FROM engineer LEFT JOIN skill ON(engineer.id = skill.id_engineer) LEFT JOIN showcase ON (`engineer`.`id` = `showcase`.`id_engineer`) WHERE skill.skill_name LIKE '%" + query.skill + "%' GROUP BY engineer.id"
+            console.log("name null");
+        } else if (query.skill == null) {
+            sql = "SELECT engineer.*, GROUP_CONCAT(DISTINCT skill.skill_name SEPARATOR ', ') AS skill_list, GROUP_CONCAT(DISTINCT showcase.showcase_name SEPARATOR ',') AS showcase_list, (SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` = 1)/(SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` IS NOT NULL) * 100 AS success_rate, (SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` IS NOT NULL) AS total_project, (SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` = 1) AS accept_project FROM engineer LEFT JOIN skill ON(engineer.id = skill.id_engineer) LEFT JOIN showcase ON (`engineer`.`id` = `showcase`.`id_engineer`) LEFT JOIN request ON( `engineer`.`id` = `request`.`id_engineer`) WHERE engineer.name  LIKE '%" + query.name + "%'"
+            sql += "GROUP BY engineer.id ORDER BY " + sort + " " + order + " LIMIT " + limit + " OFFSET " + offset + ""
+            sql2 = "SELECT engineer.*, GROUP_CONCAT(DISTINCT skill.skill_name SEPARATOR ', ') AS skill_list, GROUP_CONCAT(DISTINCT showcase.showcase_name SEPARATOR ',') AS showcase_list FROM engineer LEFT JOIN skill ON(engineer.id = skill.id_engineer) LEFT JOIN showcase ON (`engineer`.`id` = `showcase`.`id_engineer`) WHERE engineer.name  LIKE '%" + query.name + "%' GROUP BY engineer.id"
+            console.log("skill null");
+        } else if ((query.skill != null || typeof query.skill !== '') && (query.name != null || typeof query.name !== '')) {
+            sql = "SELECT engineer.*, GROUP_CONCAT(DISTINCT skill.skill_name SEPARATOR ', ') AS skill_list, GROUP_CONCAT(DISTINCT showcase.showcase_name SEPARATOR ',') AS showcase_list, (SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` = 1)/(SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` IS NOT NULL) * 100 AS success_rate, (SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` IS NOT NULL) AS total_project, (SELECT COUNT(*) FROM request WHERE `request`.`id_engineer` = engineer.id AND request.`is_accept` = 1) AS accept_project FROM engineer LEFT JOIN skill ON(engineer.id = skill.id_engineer) LEFT JOIN showcase ON (`engineer`.`id` = `showcase`.`id_engineer`) LEFT JOIN request ON( `engineer`.`id` = `request`.`id_engineer`) WHERE engineer.name LIKE '%" + query.name + "%'"
+            sql += "AND skill.skill_name LIKE '%" + query.skill + "%'"
+            sql += "GROUP BY engineer.id ORDER BY " + sort + " " + order + " LIMIT " + limit + " OFFSET " + offset + ""
+            sql2 = "SELECT engineer.*, GROUP_CONCAT(DISTINCT skill.skill_name SEPARATOR ', ') AS skill_list, GROUP_CONCAT(DISTINCT showcase.showcase_name SEPARATOR ',') AS showcase_list FROM engineer LEFT JOIN skill ON(engineer.id = skill.id_engineer) LEFT JOIN showcase ON (`engineer`.`id` = `showcase`.`id_engineer`) WHERE engineer.name LIKE '%" + query.name + "%' AND skill.skill_name LIKE '%" + query.skill + "%' GROUP BY engineer.id"
+            console.log("not null");
+        }
 
         return new Promise((resolve, reject) => {
-            db.query("SELECT `engineer`.* , GROUP_CONCAT(DISTINCT CONCAT(skill.skill_name, ',', skill.level) SEPARATOR ';') AS skill_list , GROUP_CONCAT(DISTINCT CONCAT(showcase.showcase_name, ',', showcase.year) SEPARATOR ';') AS showcase_list FROM `engineer` LEFT JOIN `skill` ON (`engineer`.`id` = `skill`.`id_engineer`) LEFT JOIN `showcase` ON (`engineer`.`id` = `showcase`.`id_engineer`) WHERE NAME LIKE '%" + name + "%' GROUP BY engineer.id ORDER BY " + sort + " " + order + " LIMIT " + limit + " OFFSET " + offset + "", (err, response) => {
-                if (!err) {
-                    resolve([response, limit, page]);
-                } else {
-                    reject(err);
+            db.query(sql, (err, response) => {
+                db.query(sql2, (err, result)=>{
+                    count = result.length;
+                    if(!err){
+                        resolve([response, limit, page, count])
+                    }
+                    else{
+                        reject(err)
+                    }
+                })
+                if(err){
+                    reject(err)
                 }
             })
         })
@@ -190,6 +222,17 @@ module.exports = {
                 if (!err) {
                     resolve(response);
                 } else {
+                    reject(err);
+                }
+            })
+        })
+    },
+    getById: (params) =>{
+        return new Promise((resolve, reject)=>{
+            db.query("SELECT * FROM engineer WHERE id = ?", params.id, (err,response)=>{
+                if(!err){
+                    resolve(response);
+                }else{
                     reject(err);
                 }
             })

@@ -3,11 +3,17 @@ const jwt = require('jsonwebtoken');
 const form = require('../Helpers/form');
 const controller = require('../Controllers/companyUser');
 
-
 const Router = express.Router();
 
 Router.get('/', Auth, controller.getData);
 Router.patch('/', Auth, controller.patchData);
+Router.post('/project', Auth, controller.postProject);
+Router.get('/project', Auth, controller.getProject);
+Router.delete('/project/:projectId', Auth, controller.deleteProject);
+Router.get('/projectlist', Auth, controller.getAvailableProject);
+
+Router.patch('/projectfinish', Auth, controller.finishProject);
+Router.post('/projectrequest', Auth, controller.postRequestProject);
 
 function Auth(req, res, next) {
     const authHeader = req.headers['authorization'];

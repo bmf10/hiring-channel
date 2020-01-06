@@ -18,7 +18,7 @@ index.listen(8000, () => {
 
 index.use(logger('dev'));
 index.use(helmet.xssFilter());
-index.use(cors());
+index.use(cors(''));
 index.use(bodyParser.json());
 index.use(bodyParser.urlencoded({
     extended: false
